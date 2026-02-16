@@ -37,8 +37,8 @@ bool HasGAPropMetadata(const ResourceKey& key)
 	if (keyObject != nullptr)	
 	{
 		cAssetMetadataPtr metaData = object_cast<Pollinator::cAssetMetadata>(keyObject);
-		App::ConsolePrintF("-----------------------------------", metaData->mName);
-		App::ConsolePrintF("Metadata: has gaprop. Name: %ls", metaData->mName);
+		/*App::ConsolePrintF("-----------------------------------", metaData->mName);
+		App::ConsolePrintF("Metadata: has gaprop. Name: %ls", metaData->mName);*/
 		if (metaData != nullptr && (metaData->mTags.size() != 0))
 		{
 			for (const eastl::string16& tag : metaData->mTags)
@@ -76,7 +76,7 @@ bool HasGAPropSummary(const ResourceKey& key)
 				//0xcd6e902c is gaprop param, 1 means that creation has gaprop tag
 				if (param.paramID == 0xcd6e902c && param.valueInt == 1)
 				{
-					App::ConsolePrintF("Summary: has gaprop");
+					//App::ConsolePrintF("Summary: has gaprop");
 					params = nullptr;
 					return true;
 				}
@@ -99,9 +99,9 @@ bool HasGAProp(const ResourceKey& key)
 /// func that returns the creation to new game
 /// i noticed that there are no gaprop tag check when u choose random creation to the new game,
 /// so i decided to add it
-static_detour(anonymous_namespace_sGetRandomKey, ResourceKey* (ResourceKey*, vector<ResourceKey>&, ResourceKey*))
+static_detour(anonymous_namespace_sGetRandomKey, ResourceKey* (ResourceKey*,const vector<ResourceKey>&, ResourceKey*))
 {
-	ResourceKey* detoured(ResourceKey * dst, vector<ResourceKey>&AssetList, ResourceKey * GGEKey)
+	ResourceKey* detoured(ResourceKey * dst, const vector<ResourceKey>&AssetList, ResourceKey * GGEKey)
 	{
 		//recon code from the game
 		if (AssetList.size() == 0)
@@ -133,11 +133,11 @@ static_detour(anonymous_namespace_sGetRandomKey, ResourceKey* (ResourceKey*, vec
 			dst->typeID = key.typeID;
 			dst->groupID = key.groupID;
 
-			//if creation has gaprop, then we go back do while-loop
+			//if creation has gaprop, then we go back to while-loop
 			if (HasGAProp(*dst))
 				goto goOutGAProp;
-			else
-				App::ConsolePrintF("creation 0x%x without gaprop tag", dst->instanceID);
+			/*else
+				App::ConsolePrintF("creation 0x%x without gaprop tag", dst->instanceID);*/
 
 			return dst;
 		}
@@ -163,9 +163,9 @@ member_detour(cMetadataSummarizer_ExctractParameters, ISummarizer, bool(const Re
 				for (eastl::string16& tag : asset->mTags)
 				{
 					// deleting spaces between tag
-					App::ConsolePrintF("old tag: \"%ls\"", tag);
+					//App::ConsolePrintF("old tag: \"%ls\"", tag);
 					strip(tag);
-					App::ConsolePrintF("new tag: \"%ls\"", tag);
+					//App::ConsolePrintF("new tag: \"%ls\"", tag);
 					newTags.push_back(tag);
 				}
 				// clear tags, assing new tags and then rewrite pollen_metadata file (idk why i add cache func i'm silly)
@@ -173,7 +173,7 @@ member_detour(cMetadataSummarizer_ExctractParameters, ISummarizer, bool(const Re
 				asset->mTags = newTags;
 				ResourceManager.WriteResource(asset.get(), nullptr, ResourceManager.FindDatabase(asset->mAssetKey));
 				ResourceManager.CacheResource(asset.get(), true);
-				App::ConsolePrintF("cMetadataSummarizer_ExctractParameters: done rewriting");
+				//App::ConsolePrintF("cMetadataSummarizer_ExctractParameters: done rewriting");
 			}
 		}
 		// ...and then we make/remake creation summary file
@@ -292,8 +292,8 @@ member_detour(cMetadataSummarizer_ExctractParameters, ISummarizer, bool(const Re
 
 void AttachDetours()
 {
-	anonymous_namespace_sGetRandomKey::attach(Address(0xde3cf0));
-	cMetadataSummarizer_ExctractParameters::attach(Address(0x55a580));
+	anonymous_namespace_sGetRandomKey::attach(Address(ModAPI::ChooseAddress(0xdb8430,0xde3cf0)));
+	cMetadataSummarizer_ExctractParameters::attach(Address(ModAPI::ChooseAddress(0x5531e0, 0x55a580)));
 	//cAssetMetadataResourceFactory_WriteResource::attach(Address(0x54b7b0));
 	
 	//GetAssetList::attach(Address(0x562e60));

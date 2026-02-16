@@ -8,7 +8,7 @@
     <Filter Include="Internal">
       <UniqueIdentifier>{d62ad12d-69d8-4933-8342-03043c9adc22}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GAPropFix">
+    <Filter Include="FixTags">
       <UniqueIdentifier>{3880d018-2395-4502-abfe-4b83e0817aab}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -20,18 +20,18 @@
       <Filter>Internal</Filter>
     </ClInclude>
     <ClInclude Include="UpdateDataBase.h">
-      <Filter>GAPropFix</Filter>
+      <Filter>FixTags</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
-      <Filter>GAPropFix</Filter>
+      <Filter>FixTags</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Internal</Filter>
     </ClCompile>
     <ClCompile Include="UpdateDataBase.cpp">
-      <Filter>GAPropFix</Filter>
+      <Filter>FixTags</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
